@@ -1,0 +1,8 @@
+prefix=/home/alper/catkin_ws/devel
+
+Name: robot_controller
+Description: Description of robot_controller
+Version: 1.0.0
+Cflags: 
+Libs: -L/home/alper/catkin_ws/devel/lib 
+Requires: 

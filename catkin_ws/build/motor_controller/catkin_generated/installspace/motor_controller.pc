@@ -1,0 +1,8 @@
+prefix=/home/alper/catkin_ws/install
+
+Name: motor_controller
+Description: Description of motor_controller
+Version: 1.0.0
+Cflags: 
+Libs: -L/home/alper/catkin_ws/install/lib 
+Requires: 
