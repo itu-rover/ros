@@ -5,10 +5,14 @@ import rospy
 # from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Imu
 import tf
+import random
 
 
 
 def main():
+
+    val  = random.random()
+    # val = 0
 
     rospy.init_node("imu_node")
     pub = rospy.Publisher('imu/data', Imu, queue_size = 10)
@@ -24,19 +28,18 @@ def main():
     rate  = rospy.Rate(10)
     while not rospy.is_shutdown():
         # Will be obtained from sensor
-        roll = 0 
-        pitch = 0
-        yaw = 0
-
+        roll = val
+        pitch = val
+        yaw = val
         # Acceloremeter
-        imuMsg.linear_acceleration.x = 0
-        imuMsg.linear_acceleration.y = 0
-        imuMsg.linear_acceleration.z = 0
+        imuMsg.linear_acceleration.x = val
+        imuMsg.linear_acceleration.y = val
+        imuMsg.linear_acceleration.z = val
 
         # Gyro
-        imuMsg.angular_velocity.x = 0
-        imuMsg.angular_velocity.y = 0 
-        imuMsg.angular_velocity.z = 0
+        imuMsg.angular_velocity.x = val
+        imuMsg.angular_velocity.y = val
+        imuMsg.angular_velocity.z = val
 
         q = tf.transformations.quaternion_from_euler(roll,pitch,yaw)
         imuMsg.orientation.x = q[0] #magnetometer
