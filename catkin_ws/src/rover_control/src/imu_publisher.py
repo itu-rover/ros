@@ -28,18 +28,18 @@ def main():
     rate  = rospy.Rate(10)
     while not rospy.is_shutdown():
         # Will be obtained from sensor
-        roll = val
-        pitch = val
+        roll = 0
+        pitch = 0
         yaw = val
         # Acceloremeter
-        imuMsg.linear_acceleration.x = val
-        imuMsg.linear_acceleration.y = val
-        imuMsg.linear_acceleration.z = val
+        imuMsg.linear_acceleration.x = 0
+        imuMsg.linear_acceleration.y = 0
+        imuMsg.linear_acceleration.z = 0
 
         # Gyro
-        imuMsg.angular_velocity.x = val
-        imuMsg.angular_velocity.y = val
-        imuMsg.angular_velocity.z = val
+        imuMsg.angular_velocity.x = 0
+        imuMsg.angular_velocity.y = 0
+        imuMsg.angular_velocity.z = 0
 
         q = tf.transformations.quaternion_from_euler(roll,pitch,yaw)
         imuMsg.orientation.x = q[0] #magnetometer
