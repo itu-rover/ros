@@ -6,30 +6,16 @@ from math import sin,cos, pi
 import random
 import rospy
 import tf
-import threading
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import NavSatFix, Imu
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3, PoseWithCovarianceStamped
 from geographic_msgs.msg import WayPoint, GeoPoint
 import numpy as np
-from serial_com import *
-from server import *
-from settings import *
 
 class VelocityController(object):
     def __init__(self):
-        rospy.init_node('rover_velocity_controller')
-        # sensor_data = SC, Pressure, Temp, Roll, Pitch , Yaw, Latitude, Longitude, Accuracy, Altitude, Speed, Battery, ITU \n
-        self.rover_cmd_vel = None
-        self.sensor_data = None
-        tcp_server = EchoServer(HOST, PORT)
-        serial_node = SerialNode(tcp_server, self)
+        rospy.init_node('rover_simulator_controller')
 
-        serial_thread = threading.Thread(
-            target=serial_node.run,
-            args=())
-        serial_thread.daemon = True
-        serial_thread.start()
 
         self.x = 0.0
         self.y = 0.0
@@ -42,13 +28,12 @@ class VelocityController(object):
         self.current_time =  rospy.Time.now()
         self.last_time =  rospy.Time.now()
 
-        # self.odom_pub = rospy.Publisher('/husky_velocity_controller/odom', Odometry, queue_size = 50)
-        self.odom_pub = rospy.Publisher('/odometry/filtered', Odometry, queue_size = 50)
+        self.odom_pub = rospy.Publisher('/husky_velocity_controller/odom', Odometry, queue_size = 50)
         self.odom_combined_pub = rospy.Publisher('/odom_combined', PoseWithCovarianceStamped, queue_size = 50)
         self.imu_pub = rospy.Publisher('/imu/data', Imu, queue_size = 50)
         self.gps_pub = rospy.Publisher('/gps/fix', NavSatFix, queue_size = 50)
         self.waypoint_pub = rospy.Publisher('/waypoint', WayPoint, queue_size = 50)
-        self.odom_broadcaster = tf.TransformBroadcaster()        
+        # self.odom_broadcaster = tf.TransformBroadcaster()        
         self.sending_data = None
         self.odom_quat =[0,0,0,1]
         self.twist = Twist()
@@ -88,18 +73,13 @@ class VelocityController(object):
             self.rover_angular_speed_str = str(self.rover_angular_speed)
 
         self.rover_cmd_vel = "B" + "1" + self.rover_linear_speed_str + self.angular_way + self.rover_angular_speed_str + "E"
-        # print(rospy.get_caller_id() + "  writing %s", self.rover_cmd_vel )
-        # rospy.loginfo(self.rover_cmd_vel)
+        print(rospy.get_caller_id() + "  writing %s", self.rover_cmd_vel )
         # self.sending_data = "I am listener! %s" % data.data
     
     def gps_callback(self,data):
             # self.x = data.x
             # self.y = data.y
-            self.odom.pose.pose = data.pose.pose
-            self.x = data.pose.pose.position.x
-            self.y = data.pose.pose.position.y
-            # rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.pose.pose)
-
+            self.odom.pose.pose = data.pose.pose 
             # self.odom_quat = tf.transformations.quaternion_from_euler(0, 0, self.th)
 
 
@@ -109,14 +89,13 @@ class VelocityController(object):
         # self.x = self.polar2cartesian([earth_radius, 41.104444, 29.026997])[0] # update self.x everytime
         # self.y = self.polar2cartesian([earth_radius, 41.104444, 29.026997])[1] # update self.x everytime
 
+
         while not rospy.is_shutdown():
 
             # for simulating
             self.vx = self.twist.linear.x
             self.vy = self.twist.linear.y
             self.vth = self.twist.angular.z
-
-            rospy.loginfo(rospy.get_caller_id() + "I heard %s", self.vx)
 
             self.current_time = rospy.Time.now()
 
@@ -143,7 +122,7 @@ class VelocityController(object):
             self.odom_quat = tf.transformations.quaternion_from_euler(0, 0, self.th)
 
             # first, we'll publish the transform over tf
-            
+            """
             self.odom_broadcaster.sendTransform(
                 (self.x, self.y, 0.),
                 self.odom_quat,
@@ -151,7 +130,7 @@ class VelocityController(object):
                 "base_link",
                 "odom"
             )
-            
+            """
             # next, we'll publish the odometry message over ROS
             self.odom = Odometry()
             self.odom.header.stamp = self.current_time
@@ -173,18 +152,15 @@ class VelocityController(object):
             self.last_time = self.current_time
 
             # publish the NavSatFix
-            # sensor_data = SC, Pressure, Temp, Roll, Pitch , Yaw, Latitude, Longitude, Accuracy, Altitude, Speed, Battery, ITU \n
-            self.sensor_split = ['SC','0','0','0','0','0','0','0','ITU']
-            if self.sensor_data:
-                self.sensor_split = self.sensor_data.split(',')
+            self.sensor_data = None
             self.gps_fix = NavSatFix()
             self.gps_fix.header.frame_id = "base_link"
             self.gps_fix.header.stamp = self.odom.header.stamp
             self.gps_fix.status.status = 0 # GPS FIXED
             self.gps_fix.status.service = 1 # GPS SERVICE = GPS
             # Buralar bizden gelecek
-            self.gps_fix.latitude = float(self.sensor_split[6]) # 41.24600
-            self.gps_fix.longitude = float(self.sensor_split[7])
+            self.gps_fix.latitude = 41.24600
+            self.gps_fix.longitude = 29.123123
             self.gps_fix.altitude = 0
             self.gps_fix.position_covariance = [0,0,0,0,0,0,0,0,0]
             self.gps_fix.position_covariance_type = 0
@@ -192,8 +168,8 @@ class VelocityController(object):
             # publish the NavSatFix
             self.waypoint = WayPoint()
             # self.waypoint.id.uuid = [1]
-            self.waypoint.position.latitude = 40.84600
-            self.waypoint.position.longitude = 29.392400
+            self.waypoint.position.latitude = 41.24678
+            self.waypoint.position.longitude = 29.123100
             self.waypoint.position.altitude = 0
             # self.waypoint.props.key = "key"
             # self.waypoint.props.value = "1"
@@ -206,8 +182,7 @@ class VelocityController(object):
             
             self.roll = 0
             self.pitch = 0
-            self.yaw = float(self.sensor_split[5])*pi/180 # self.th
-            self.th = self.yaw
+            self.yaw = self.th # şimdilik
             # Acceloremeter
             self.imuMsg.linear_acceleration.x = 0
             self.imuMsg.linear_acceleration.y = 0

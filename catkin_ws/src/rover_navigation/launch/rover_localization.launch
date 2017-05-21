@@ -77,17 +77,6 @@
 
   <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="screen">
 
-    <remap from="/gps/fix" to="/fix"/>
-    <param name="magnetic_declination_radians" value="0"/>
-
-    <param name="yaw_offset" value="0"/>
-
-    <param name="zero_altitude" value="true"/>
-
-    <param name="broadcast_utm_transform" value="false"/>
-
-    <param name="publish_filtered_gps" value="false"/>
-
   </node>
 
 </launch>
