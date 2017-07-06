@@ -25,7 +25,7 @@ int V_MAX = 225;
 
 int H_MIN = 30; 
 int H_MAX = 64;
-int S_MIN = 35; // 61
+int S_MIN = 61; // 61
 int S_MAX = 255; // 137
 int V_MIN = 60; // 199
 int V_MAX = 222;
@@ -240,7 +240,7 @@ public:
       return;
     }
 
-    bool calibrationMode = false;
+    bool calibrationMode = true;
 
     if(calibrationMode){
       //create slider bars for HSV filtering
@@ -255,10 +255,10 @@ public:
     cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
     inRange(HSV,Scalar(H_MIN,S_MIN,V_MIN),Scalar(H_MAX,S_MAX,V_MAX),threshold);
     morphOps(threshold);
-    // cv::imshow(windowName2,threshold);
+    cv::imshow(windowName2,threshold);
     trackFilteredObject(threshold,HSV,cameraFeed);
     // Update GUI Window
-    // cv::imshow(windowName, cameraFeed);
+    cv::imshow(windowName, cameraFeed);
     cv::waitKey(3);
 
     // Output modified video stream
