@@ -1,0 +1,19 @@
+topics:
+- name    : joy
+  topic   : husky_velocity_controller/joy_vel
+  timeout : 0.5
+  priority: 100
+- name    : im_proc
+  topic   : husky_velocity controller/final_vel
+  timeout : 0.5
+  priority: 10
+- name    : autonomy
+  topic   : husky_velocity_controller/cmd_vel
+  timeout : 0.5
+  priority: 10
+  
+locks:
+- name    : e_stop
+  topic   : e_stop
+  timeout : 0.0    
+  priority: 255
